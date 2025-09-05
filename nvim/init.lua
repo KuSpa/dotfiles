@@ -96,3 +96,9 @@ vim.opt.number = true
 vim.opt.cursorline = true
 vim.opt.signcolumn = "yes"
 vim.opt.relativenumber = true
+vim.cmd([[
+cnoremap <expr> <up> wildmenumode() ? "\<left>" : "\<up>"
+cnoremap <expr> <down> wildmenumode() ? "\<right>" : "\<down>"
+cnoremap <expr> <left> wildmenumode() ? "\<up>" : "\<left>"
+cnoremap <expr> <right> wildmenumode() ? " \<bs>\<C-Z>" : "\<right>"
+]])
