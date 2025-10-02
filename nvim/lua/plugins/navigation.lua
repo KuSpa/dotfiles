@@ -6,6 +6,10 @@ return {
 		config = function()
 			local actions = require("telescope.actions")
 			require("telescope").setup({
+				defaults = {
+					path_display = { shorten = { len = 1, exclude = { -1 } } },
+					dynamic_preview_title = true,
+				},
 				pickers = {
 					buffers = {
 						mappings = {

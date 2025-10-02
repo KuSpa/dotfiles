@@ -61,7 +61,7 @@ return {
 			local opts = { noremap = true, silent = true }
 			--vim.api.nvim_set_keymap("n", "gD", "<cmd>lua vim.lsp.buf.declaration()<CR>",	opts)
 			vim.api.nvim_set_keymap("n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>", opts)
-
+			vim.api.nvim_set_keymap("n", "<leader>ge", "<cmd>lua vim.lsp.buf.code_action() <CR>", opts)
 			local cmp = require("cmp")
 			return {
 				mapping = cmp.mapping.preset.insert({
