@@ -9,6 +9,7 @@ return {
 				defaults = {
 					path_display = { shorten = { len = 1, exclude = { -1 } } },
 					dynamic_preview_title = true,
+					preview = { treesitter = false },
 				},
 				pickers = {
 					buffers = {
