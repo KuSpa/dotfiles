@@ -79,6 +79,9 @@ vim.keymap.set(
 vim.keymap.set("n", "grr", function()
 	require("telescope.builtin").lsp_references()
 end, { noremap = true, silent = true })
+-- TODO make this use jump instead
+vim.keymap.set("n", "g]", vim.diagnostic.goto_next)
+vim.keymap.set("n", "g[", vim.diagnostic.goto_prev)
 -- TODO not really happy with this, because both is left hand and w for jump window is quite far away. Probably gonna hardcode window management
 vim.keymap.set("n", "<TAB>", "<C-w>", { noremap = true, silent = true })
 vim.keymap.set({ "i", "n", "v" }, "ää", "<ESC>", { noremap = true, silent = true })
@@ -106,7 +109,7 @@ cnoremap <expr> <down> wildmenumode() ? "\<right>" : "\<down>"
 cnoremap <expr> <left> wildmenumode() ? "\<up>" : "\<left>"
 cnoremap <expr> <right> wildmenumode() ? " \<bs>\<C-Z>" : "\<right>"
 ]])
-
+vim.cmd([[autocmd FileType markdown setlocal spell spelllang=en_us]])
 --[[local function organize_imports()
 	local params = {
 		command = "_typescript.organizeImports",
