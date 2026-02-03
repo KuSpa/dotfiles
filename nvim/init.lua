@@ -88,17 +88,6 @@ vim.keymap.set({ "i", "n", "v" }, "ää", "<ESC>", { noremap = true, silent = tr
 vim.keymap.set("t", "<Esc>", [[<C-\><C-n>]])
 vim.keymap.set("t", "ää", [[<C-\><C-n>]])
 
-vim.lsp.config("lua_ls", {
-	settings = {
-		Lua = {
-			workspace = { checkThirdParty = false, library = vim.api.nvim_get_runtime_file("", true) },
-			diagnostics = {
-				globals = { "vim" },
-			},
-		},
-	},
-})
-
 vim.opt.number = true
 vim.opt.cursorline = true
 vim.opt.signcolumn = "yes"

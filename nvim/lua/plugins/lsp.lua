@@ -5,10 +5,41 @@ return {
 	},
 	{
 		"mason-org/mason-lspconfig.nvim",
-		opts = {},
 		dependencies = {
 			"mason-org/mason.nvim",
 			"neovim/nvim-lspconfig",
+		},
+		opts = {
+			ensure_installed = {
+				"lua_ls",
+				"ts_ls",
+				"cssls",
+				"html",
+				"jsonls",
+			},
+			automatic_installation = true,
+			handlers = {
+				-- Default handler for all servers
+				function(server_name)
+					require("lspconfig")[server_name].setup({})
+				end,
+				-- Custom handler for lua_ls
+				["lua_ls"] = function()
+					require("lspconfig").lua_ls.setup({
+						settings = {
+							Lua = {
+								workspace = {
+									checkThirdParty = false,
+									library = vim.api.nvim_get_runtime_file("", true),
+								},
+								diagnostics = {
+									globals = { "vim" },
+								},
+							},
+						},
+					})
+				end,
+			},
 		},
 	},
 	{
@@ -87,7 +118,45 @@ return {
 	{
 		"mrcjkb/rustaceanvim",
 		version = "^6", -- Recommended
-		lazy = false, -- This plugin is already lazy
+		lazy = false,
+		init = function()
+			vim.g.rustaceanvim = {
+				server = {
+					on_attach = function(client, bufnr)
+						vim.keymap.set("n", "gd", function()
+							vim.lsp.buf.definition({
+								on_list = function(options)
+									-- Deduplicate by location
+									local seen, items = {}, {}
+									for _, item in ipairs(options.items) do
+										local key = ("%s:%d:%d"):format(item.filename, item.lnum, item.col)
+										if not seen[key] then
+											seen[key] = true
+											items[#items + 1] = item
+										end
+									end
+
+									if #items == 1 then
+										vim.cmd.edit(items[1].filename)
+										vim.api.nvim_win_set_cursor(0, { items[1].lnum, items[1].col - 1 })
+									else
+										require("telescope.pickers").new({}, {
+											prompt_title = "Definitions",
+											finder = require("telescope.finders").new_table({
+												results = items,
+												entry_maker = require("telescope.make_entry").gen_from_quickfix(),
+											}),
+											previewer = require("telescope.config").values.qflist_previewer({}),
+											sorter = require("telescope.config").values.generic_sorter({}),
+										}):find()
+									end
+								end,
+							})
+						end, { buffer = bufnr, desc = "Go to definition" })
+					end,
+				},
+			}
+		end,
 	},
 	{
 		"OXY2DEV/markview.nvim",
