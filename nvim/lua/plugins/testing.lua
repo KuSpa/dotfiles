@@ -46,14 +46,14 @@ return {
 			desc = "Show test output",
 		},
 		{
-			"<leader>tO",
+			"<leader>tp",
 			function()
 				require("neotest").output_panel.toggle()
 			end,
 			desc = "Toggle output panel",
 		},
 		{
-			"<leader>tS",
+			"<leader>tx",
 			function()
 				require("neotest").run.stop()
 			end,

@@ -87,10 +87,10 @@ return {
 						hidden = true,
 						mappings = {
 							["i"] = {
-								["ää"] = actions.close,
+								["…"] = actions.close,
 							},
 							["n"] = {
-								["ää"] = actions.close,
+								["…"] = actions.close,
 							},
 						},
 					},
