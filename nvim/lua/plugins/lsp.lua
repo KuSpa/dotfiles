@@ -93,6 +93,7 @@ return {
 			--vim.api.nvim_set_keymap("n", "gD", "<cmd>lua vim.lsp.buf.declaration()<CR>",	opts)
 			vim.api.nvim_set_keymap("n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>", opts)
 			vim.api.nvim_set_keymap("n", "<leader>ge", "<cmd>lua vim.lsp.buf.code_action() <CR>", opts)
+			vim.api.nvim_set_keymap("n", "<leader>gg", "<cmd>lua vim.lsp.buf.rename()<CR>", opts)
 			local cmp = require("cmp")
 			return {
 				mapping = cmp.mapping.preset.insert({
@@ -140,15 +141,17 @@ return {
 										vim.cmd.edit(items[1].filename)
 										vim.api.nvim_win_set_cursor(0, { items[1].lnum, items[1].col - 1 })
 									else
-										require("telescope.pickers").new({}, {
-											prompt_title = "Definitions",
-											finder = require("telescope.finders").new_table({
-												results = items,
-												entry_maker = require("telescope.make_entry").gen_from_quickfix(),
-											}),
-											previewer = require("telescope.config").values.qflist_previewer({}),
-											sorter = require("telescope.config").values.generic_sorter({}),
-										}):find()
+										require("telescope.pickers")
+											.new({}, {
+												prompt_title = "Definitions",
+												finder = require("telescope.finders").new_table({
+													results = items,
+													entry_maker = require("telescope.make_entry").gen_from_quickfix(),
+												}),
+												previewer = require("telescope.config").values.qflist_previewer({}),
+												sorter = require("telescope.config").values.generic_sorter({}),
+											})
+											:find()
 									end
 								end,
 							})
