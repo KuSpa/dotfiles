@@ -1,3 +1,23 @@
+-- LSP keybindings (buffer-local, only active when LSP is attached)
+vim.api.nvim_create_autocmd("LspAttach", {
+	group = vim.api.nvim_create_augroup("UserLspConfig", { clear = true }),
+	callback = function(args)
+		local bufnr = args.buf
+		local opts = function(desc)
+			return { buffer = bufnr, noremap = true, silent = true, desc = desc }
+		end
+
+		vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts("Go to definition"))
+		vim.keymap.set("n", "grr", function()
+			require("telescope.builtin").lsp_references()
+		end, opts("References (Telescope)"))
+		vim.keymap.set("n", "<leader>ge", vim.lsp.buf.code_action, opts("Code action"))
+		vim.keymap.set("n", "<leader>gg", vim.lsp.buf.rename, opts("Rename"))
+		vim.keymap.set("n", "g]", vim.diagnostic.goto_next, opts("Next diagnostic"))
+		vim.keymap.set("n", "g[", vim.diagnostic.goto_prev, opts("Prev diagnostic"))
+	end,
+})
+
 return {
 	{
 		"mason-org/mason.nvim",
@@ -48,7 +68,8 @@ return {
 		cmd = { "ConformInfo" },
 		keys = {
 			{
-				-- Customize or remove this keymap to your liking
+				-- TODO: <leader>f conflicts with <leader>ff, <leader>fg etc. (causes delay)
+				-- Consider changing to <leader>cf or removing (format-on-save is enabled anyway)
 				"<leader>f",
 				function()
 					require("conform").format({ async = true })
@@ -57,11 +78,9 @@ return {
 				desc = "Format buffer",
 			},
 		},
-		-- This will provide type hinting with LuaLS
 		---@module "conform"
 		---@type conform.setupOpts
 		opts = {
-			-- Define your formatters
 			formatters_by_ft = {
 				lua = { "stylua" },
 				css = { "prettierd", "prettier", stop_after_first = true },
@@ -69,38 +88,30 @@ return {
 				typescript = { "prettierd", "prettier", stop_after_first = true },
 				javascript = { "prettierd", "prettier", stop_after_first = true },
 			},
-			-- Set default options
 			default_format_opts = {
 				lsp_format = "fallback",
 			},
-			-- Set up format-on-save
 			format_on_save = { timeout_ms = 500 },
 		},
 	},
 	{
 		"hrsh7th/nvim-cmp",
-		version = false, -- last release is way too old
-		--event = "InsertEnter",
+		version = false,
 		dependencies = {
 			"hrsh7th/cmp-nvim-lsp",
 			"hrsh7th/cmp-buffer",
 			"hrsh7th/cmp-path",
 		},
 		opts = function()
-			-- brauche ich das? setzt highlights lol
 			vim.api.nvim_set_hl(0, "CmpGhostText", { link = "Comment", default = true })
-			local opts = { noremap = true, silent = true }
-			--vim.api.nvim_set_keymap("n", "gD", "<cmd>lua vim.lsp.buf.declaration()<CR>",	opts)
-			vim.api.nvim_set_keymap("n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>", opts)
-			vim.api.nvim_set_keymap("n", "<leader>ge", "<cmd>lua vim.lsp.buf.code_action() <CR>", opts)
-			vim.api.nvim_set_keymap("n", "<leader>gg", "<cmd>lua vim.lsp.buf.rename()<CR>", opts)
 			local cmp = require("cmp")
 			return {
 				mapping = cmp.mapping.preset.insert({
+					-- NOTE: <C-f> conflicts with toggleterm open_mapping
+					-- Consider changing one of them if this causes issues
 					["<C-f>"] = cmp.mapping.scroll_docs(4),
 					["<C-n>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
 					["<C-p>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
-					--["<C-j>"] = cmp.mapping.complete(),
 					["<CR>"] = cmp.mapping.confirm({ select = true }),
 					["<C-CR>"] = function(fallback)
 						cmp.abort()
@@ -109,25 +120,22 @@ return {
 				}),
 				sources = cmp.config.sources({
 					{ name = "nvim_lsp" },
-					-- for now i am happy with what i got. I don't know why it is weird on .md files
-					-- { name = "path" },
-					--        { name = "buffer" },
 				}),
 			}
 		end,
 	},
 	{
 		"mrcjkb/rustaceanvim",
-		version = "^6", -- Recommended
+		version = "^6",
 		lazy = false,
 		init = function()
 			vim.g.rustaceanvim = {
 				server = {
 					on_attach = function(client, bufnr)
+						-- Rust-specific gd override: deduplicates definitions and uses Telescope for multiple
 						vim.keymap.set("n", "gd", function()
 							vim.lsp.buf.definition({
 								on_list = function(options)
-									-- Deduplicate by location
 									local seen, items = {}, {}
 									for _, item in ipairs(options.items) do
 										local key = ("%s:%d:%d"):format(item.filename, item.lnum, item.col)
@@ -155,7 +163,7 @@ return {
 									end
 								end,
 							})
-						end, { buffer = bufnr, desc = "Go to definition" })
+						end, { buffer = bufnr, desc = "Go to definition (Rust)" })
 					end,
 				},
 			}
@@ -167,10 +175,5 @@ return {
 		opts = {
 			preview = { icon_provider = "devicons" },
 		},
-		-- Completion for `blink.cmp`
-		-- dependencies = { "saghen/blink.cmp" },
 	},
-	--{
-	--	"nvim-tree/nvim-web-devicons", opts = {}
-	--}
 }
