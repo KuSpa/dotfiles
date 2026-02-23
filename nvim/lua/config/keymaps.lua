@@ -7,6 +7,7 @@ local M = {}
 -- <leader f> finding (stuff in telescope)
 -- <leader a> arrange windows
 -- <leader l> lsp interaction (except navigation)
+-- <leader cc> ClaudeCode
 -- TODO lsp default keys mappen (e.g :help grr und so)
 function M.setup()
 	-- Escape alternatives (German keyboard friendly)
