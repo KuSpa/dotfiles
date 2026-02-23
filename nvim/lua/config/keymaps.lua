@@ -9,16 +9,12 @@ local M = {}
 -- <leader l> lsp interaction (except navigation)
 -- TODO lsp default keys mappen (e.g :help grr und so)
 function M.setup()
-	-- Window management
-	-- TODO: not really happy with this, because both is left hand and w for jump window is quite far away
-	vim.keymap.set("n", "<TAB>", "<C-w>", { noremap = true, silent = true, desc = "Window prefix" })
-
 	-- Escape alternatives (German keyboard friendly)
-	vim.keymap.set({ "i", "n", "v"}, "…", "<Esc>", { noremap = true, silent = true, desc = "Escape" })
+	vim.keymap.set({ "i", "n", "v" }, "…", "<Esc>", { noremap = true, silent = true, desc = "Escape" })
 	vim.keymap.set("c", "…", "<C-c>", { noremap = true, silent = true, desc = "Escape" })
 
 	-- Terminal mappings
-	vim.keymap.set("t", "<Esc>", [[<C-\><C-n>]], { desc = "Exit terminal mode" })
+	vim.keymap.set("t", "<Esc>", "<Esc>")
 	vim.keymap.set("t", "…", [[<C-\><C-n>]], { desc = "Exit terminal mode" })
 
 	-- Wildmenu navigation (command mode)
@@ -28,6 +24,14 @@ function M.setup()
 		cnoremap <expr> <left> wildmenumode() ? "\<up>" : "\<left>"
 		cnoremap <expr> <right> wildmenumode() ? " \<bs>\<C-Z>" : 	"\<right>"
 	]])
+
+	--Window management
+	vim.keymap.set("n", "<leader>a", "<C-w>", { noremap = true, silent = true, desc = "Window" })
+	-- TODO <C-w>] use horizontal split
+
+	-- TODO vsplit with opening the buffer in a new window (default behavior) and falling back to the previous buffer in the origin window. (looks like a "move buffer")
+
+	-- TODO (h)split same but horizontally
 end
 
 return M

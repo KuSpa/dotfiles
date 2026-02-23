@@ -1,4 +1,7 @@
--- LSP keybindings (buffer-local, only active when LSP is attached)
+local border = "rounded"
+vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = border })
+vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, { border = border })
+
 vim.api.nvim_create_autocmd("LspAttach", {
 	group = vim.api.nvim_create_augroup("UserLspConfig", { clear = true }),
 	callback = function(args)
@@ -7,14 +10,15 @@ vim.api.nvim_create_autocmd("LspAttach", {
 			return { buffer = bufnr, noremap = true, silent = true, desc = desc }
 		end
 
-		vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts("Go to definition"))
-		vim.keymap.set("n", "grr", function()
-			require("telescope.builtin").lsp_references()
-		end, opts("References (Telescope)"))
-		vim.keymap.set("n", "<leader>ge", vim.lsp.buf.code_action, opts("Code action"))
-		vim.keymap.set("n", "<leader>gg", vim.lsp.buf.rename, opts("Rename"))
 		vim.keymap.set("n", "g]", vim.diagnostic.goto_next, opts("Next diagnostic"))
 		vim.keymap.set("n", "g[", vim.diagnostic.goto_prev, opts("Prev diagnostic"))
+		vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts("Go to definition"))
+		vim.keymap.set("n", "<leader>lg", vim.lsp.buf.references, opts("LSP References"))
+		vim.keymap.set("n", "<leader>la", vim.lsp.buf.code_action, opts("LSP Code Action"))
+		vim.keymap.set("n", "<leader>lr", vim.lsp.buf.rename, opts("LSP Rename"))
+		-- <leader>lf format
+		vim.keymap.set({ "i", "n" }, "<C-f>", vim.lsp.buf.hover, opts("LSP Hover"))
+		vim.keymap.set({ "i", "n" }, "<C-s>", vim.lsp.buf.signature_help, opts("LSP Signaturehelp"))
 	end,
 })
 
@@ -68,9 +72,7 @@ return {
 		cmd = { "ConformInfo" },
 		keys = {
 			{
-				-- TODO: <leader>f conflicts with <leader>ff, <leader>fg etc. (causes delay)
-				-- Consider changing to <leader>cf or removing (format-on-save is enabled anyway)
-				"<leader>f",
+				"<leader>lf",
 				function()
 					require("conform").format({ async = true })
 				end,
@@ -106,14 +108,14 @@ return {
 			vim.api.nvim_set_hl(0, "CmpGhostText", { link = "Comment", default = true })
 			local cmp = require("cmp")
 			return {
+				window = {
+					completion = cmp.config.window.bordered({ border = "rounded" }),
+					documentation = cmp.config.window.bordered({ border = "rounded" }),
+				},
 				mapping = cmp.mapping.preset.insert({
-					-- NOTE: <C-f> conflicts with toggleterm open_mapping
-					-- Consider changing one of them if this causes issues
-					["<C-f>"] = cmp.mapping.scroll_docs(4),
-					["<C-n>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
-					["<C-p>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
+					["<C-<Down>>"] = cmp.mapping.scroll_docs(4),
 					["<CR>"] = cmp.mapping.confirm({ select = true }),
-					["<C-CR>"] = function(fallback)
+					["…"] = function(fallback)
 						cmp.abort()
 						fallback()
 					end,
@@ -132,38 +134,15 @@ return {
 			vim.g.rustaceanvim = {
 				server = {
 					on_attach = function(client, bufnr)
-						-- Rust-specific gd override: deduplicates definitions and uses Telescope for multiple
-						vim.keymap.set("n", "gd", function()
-							vim.lsp.buf.definition({
-								on_list = function(options)
-									local seen, items = {}, {}
-									for _, item in ipairs(options.items) do
-										local key = ("%s:%d:%d"):format(item.filename, item.lnum, item.col)
-										if not seen[key] then
-											seen[key] = true
-											items[#items + 1] = item
-										end
-									end
-
-									if #items == 1 then
-										vim.cmd.edit(items[1].filename)
-										vim.api.nvim_win_set_cursor(0, { items[1].lnum, items[1].col - 1 })
-									else
-										require("telescope.pickers")
-											.new({}, {
-												prompt_title = "Definitions",
-												finder = require("telescope.finders").new_table({
-													results = items,
-													entry_maker = require("telescope.make_entry").gen_from_quickfix(),
-												}),
-												previewer = require("telescope.config").values.qflist_previewer({}),
-												sorter = require("telescope.config").values.generic_sorter({}),
-											})
-											:find()
-									end
-								end,
-							})
-						end, { buffer = bufnr, desc = "Go to definition (Rust)" })
+						--vim.keymap.set("n", "<leader>la", function() vim.cmd.RustLsp("codeAction") end
+						vim.keymap.set(
+							{ "n", "i" },
+							"<C-f>", -- Override Neovim's built-in hover keymap with rustaceanvim's hover actions
+							function()
+								vim.cmd.RustLsp({ "hover", "actions" })
+							end,
+							{ silent = true, buffer = bufnr }
+						)
 					end,
 				},
 			}

@@ -62,6 +62,11 @@ return {
 				":Telescope file_browser path=%:p:h select_buffer=true<CR>",
 				desc = "File browser",
 			},
+			{
+				"<leader>fc",
+				":Telescope git_status path=%:p:h select_buffer=true<CR>",
+				-- desc = "Changes browser",
+			},
 		},
 		config = function()
 			local actions = require("telescope.actions")
@@ -70,6 +75,11 @@ return {
 					path_display = { shorten = { len = 1, exclude = { -1 } } },
 					dynamic_preview_title = true,
 					preview = { treesitter = false },
+					mappings = {
+						n = {
+							["…"] = actions.close,
+						},
+					},
 				},
 				pickers = {
 					buffers = {
@@ -85,23 +95,25 @@ return {
 						-- disables netrw and use telescope-file-browser in its place
 						hijack_netrw = true,
 						hidden = true,
-						mappings = {
-							["i"] = {
-								["…"] = actions.close,
-							},
-							["n"] = {
-								["…"] = actions.close,
-							},
-						},
+					},
+					["ui-select"] = {
+						require("telescope.themes").get_dropdown({}),
 					},
 				},
 			})
+			-- Use telescope for List uses
+			vim.lsp.buf.definition = require("telescope.builtin").lsp_definitions
+			vim.lsp.buf.references = require("telescope.builtin").lsp_references
+			vim.lsp.buf.implementation = require("telescope.builtin").lsp_implementations
+			vim.lsp.buf.type_definition = require("telescope.builtin").lsp_type_definitions
 			-- Load extension AFTER telescope.setup()
 			require("telescope").load_extension("file_browser")
+			require("telescope").load_extension("ui-select")
 		end,
 	},
 	{
 		"nvim-telescope/telescope-file-browser.nvim",
 		dependencies = { "nvim-telescope/telescope.nvim", "nvim-lua/plenary.nvim" },
 	},
+	{ "nvim-telescope/telescope-ui-select.nvim" },
 }

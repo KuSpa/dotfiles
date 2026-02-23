@@ -13,7 +13,11 @@ vim.diagnostic.enable()
 vim.diagnostic.config({
 	virtual_text = true,
 	update_in_insert = true,
+	float = { border = "rounded" },
 })
+
+-- Global floating window border (Neovim 0.10+)
+vim.o.winborder = "rounded"
 
 -- Editor options
 vim.opt.number = true
