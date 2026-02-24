@@ -27,12 +27,55 @@ function M.setup()
 	]])
 
 	--Window management
-	vim.keymap.set("n", "<leader>a", "<C-w>", { noremap = true, silent = true, desc = "Window" })
-	-- TODO <C-w>] use horizontal split
+	vim.keymap.set("n", "<leader>a", "<C-w>", { remap = true, desc = "Window" })
 
-	-- TODO vsplit with opening the buffer in a new window (default behavior) and falling back to the previous buffer in the origin window. (looks like a "move buffer")
+	-- Move buffer to a window in the given direction
+	local function move_buffer_to_direction(direction)
+		local current_win = vim.api.nvim_get_current_win()
+		local current_buf = vim.api.nvim_get_current_buf()
 
-	-- TODO (h)split same but horizontally
+		-- Try to move to window in that direction
+		vim.cmd("wincmd " .. direction)
+		local target_win = vim.api.nvim_get_current_win()
+
+		if target_win == current_win then
+			-- No window in that direction, create a split
+			local split_cmd = (direction == "h" or direction == "l") and "vsplit" or "split"
+			if direction == "h" or direction == "k" then
+				vim.cmd("leftabove " .. split_cmd)
+			else
+				vim.cmd("rightbelow " .. split_cmd)
+			end
+			target_win = vim.api.nvim_get_current_win()
+		end
+
+		-- Open current buffer in target window
+		vim.api.nvim_win_set_buf(target_win, current_buf)
+
+		-- Go back to original window and switch to previous buffer
+		vim.api.nvim_set_current_win(current_win)
+		vim.cmd("bprevious")
+
+		-- Focus on target window
+		vim.api.nvim_set_current_win(target_win)
+	end
+
+	local directions = {
+		{ key = "<Right>", dir = "l", desc = "right" },
+		{ key = "<Left>", dir = "h", desc = "left" },
+		{ key = "<Up>", dir = "k", desc = "above" },
+		{ key = "<Down>", dir = "j", desc = "below" },
+	}
+
+	for _, d in ipairs(directions) do
+		vim.keymap.set("n", "<C-w>m" .. d.key, function()
+			move_buffer_to_direction(d.dir)
+		end, { noremap = true, silent = true, desc = "Move buffer to window " .. d.desc })
+		vim.keymap.set("n", "<C-w>]" .. d.key, function()
+			vim.lsp.buf.definition()
+			move_buffer_to_direction(d.dir)
+		end, { noremap = true, silent = true, desc = "Open definition on " .. d.desc })
+	end
 end
 
 return M
