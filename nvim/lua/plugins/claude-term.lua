@@ -25,12 +25,25 @@ local function toggle_claude_term()
 			hidden = true,
 			close_on_exit = false,
 			on_open = function(term)
-				vim.cmd("startinsert!")
 				-- Send raw <Esc> to terminal (ASCII 27 = escape)
 				vim.keymap.set("t", "<Esc>", "<Esc>", { buffer = term.bufnr, noremap = true, silent = true })
-				vim.keymap.set("t", "…", function()
+				vim.keymap.set("t", "…", [[<C-\><C-n>]], { buffer = term.bufnr, noremap = true, silent = true })
+				vim.keymap.set("n", "…", function()
 					claude_term:toggle()
 				end, { buffer = term.bufnr, noremap = true, silent = true })
+
+				-- Auto-enter insert mode when entering this terminal buffer
+				vim.api.nvim_create_autocmd("BufEnter", {
+					buffer = term.bufnr,
+					callback = function()
+						-- Defer to ensure we're the last thing to run
+						vim.defer_fn(function()
+							if vim.api.nvim_get_current_buf() == term.bufnr then
+								vim.cmd("startinsert!")
+							end
+						end, 1)
+					end,
+				})
 			end,
 		})
 	end
