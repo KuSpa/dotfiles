@@ -20,9 +20,9 @@ require("lazy").setup({
 	spec = {
 		{ import = "plugins" },
 	},
-	install = { colorscheme = { "gruvbox" } },
+	install = { colorscheme = { "catppuccin-macchiato" } },
 	-- automatically check for plugin updates
 	-- checker = { enabled = true },
 })
 
-vim.cmd([[colorscheme gruvbox]])
+vim.cmd([[colorscheme catppuccin-macchiato]])

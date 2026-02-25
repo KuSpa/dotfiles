@@ -10,8 +10,12 @@ vim.api.nvim_create_autocmd("LspAttach", {
 			return { buffer = bufnr, noremap = true, silent = true, desc = desc }
 		end
 
-		vim.keymap.set("n", "g]", vim.diagnostic.goto_next, opts("Next diagnostic"))
-		vim.keymap.set("n", "g[", vim.diagnostic.goto_prev, opts("Prev diagnostic"))
+		vim.keymap.set("n", "g]", function()
+			vim.diagnostic.jump({ count = 1 })
+		end, opts("Next diagnostic"))
+		vim.keymap.set("n", "g[", function()
+			vim.diagnostic.jump({ count = -1 })
+		end, opts("Prev diagnostic"))
 		vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts("Go to definition"))
 		vim.keymap.set("n", "<leader>lg", vim.lsp.buf.references, opts("LSP References"))
 		vim.keymap.set("n", "<leader>la", vim.lsp.buf.code_action, opts("LSP Code Action"))
