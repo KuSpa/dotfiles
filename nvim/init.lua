@@ -28,3 +28,4 @@ vim.opt.showmode = false
 
 -- Filetype specific settings
 vim.cmd([[autocmd FileType markdown setlocal spell spelllang=en_us]])
+vim.cmd([[Limelight]])

@@ -39,6 +39,7 @@ local function toggle_claude_term()
 						-- Defer to ensure we're the last thing to run
 						vim.defer_fn(function()
 							if vim.api.nvim_get_current_buf() == term.bufnr then
+								vim.cmd("Limelight!")
 								vim.cmd("startinsert!")
 							end
 						end, 1)

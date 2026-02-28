@@ -8,11 +8,22 @@ local M = {}
 -- <leader a> arrange windows
 -- <leader l> lsp interaction (except navigation)
 -- <leader cc> ClaudeCode
+-- <leader i> insert char
 -- TODO lsp default keys mappen (e.g :help grr und so)
 function M.setup()
 	-- Escape alternatives (German keyboard friendly)
 	vim.keymap.set({ "i", "n", "v" }, "…", "<Esc>", { noremap = true, silent = true, desc = "Escape" })
 	vim.keymap.set("c", "…", "<C-c>", { noremap = true, silent = true, desc = "Escape" })
+
+	-- pastes a single character to be replaced by the next char. Messes up your registers tho
+	vim.keymap.set("n", "<leader>i", "x<Left>ppr", { noremap = true, silent = true, desc = "Insert single character" })
+
+	vim.keymap.set(
+		{ "n" },
+		"<leader>ll",
+		":Limelight!!<CR>",
+		{ noremap = true, silent = true, desc = "Focustimeeeeeeee" }
+	)
 
 	-- Terminal mappings
 	vim.keymap.set("t", "<Esc>", "<Esc>")

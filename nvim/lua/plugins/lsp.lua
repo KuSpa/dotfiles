@@ -117,7 +117,7 @@ return {
 					documentation = cmp.config.window.bordered({ border = "rounded" }),
 				},
 				mapping = cmp.mapping.preset.insert({
-					["<C-<Down>>"] = cmp.mapping.scroll_docs(4),
+					["<C-Down>"] = cmp.mapping.scroll_docs(4),
 					["<CR>"] = cmp.mapping.confirm({ select = true }),
 					["…"] = function(fallback)
 						cmp.abort()
