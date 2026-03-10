@@ -40,6 +40,7 @@ return {
 		opts = {
 			ensure_installed = {
 				"lua_ls",
+				"pyright",
 				"ts_ls",
 				"cssls",
 				"html",
@@ -93,6 +94,10 @@ return {
 				scss = { "prettierd", "prettier", stop_after_first = true },
 				typescript = { "prettierd", "prettier", stop_after_first = true },
 				javascript = { "prettierd", "prettier", stop_after_first = true },
+				html = { "prettierd", "prettier", stop_after_first = true },
+				xml = { "xmllint", stop_after_first = true },
+				rust = { "rustfmt", stop_after_first = true },
+				python = { "ruff", stop_after_first = true },
 			},
 			default_format_opts = {
 				lsp_format = "fallback",
