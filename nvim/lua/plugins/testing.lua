@@ -8,6 +8,7 @@ return {
 		"nvim-neotest/neotest-jest",
 		"mrcjkb/rustaceanvim", -- For Rust test adapter
 		"marilari88/neotest-vitest", -- For Vitest/Bun adapter
+		"nvim-neotest/neotest-python", -- For pytest adapter
 	},
 	keys = {
 		{
@@ -108,6 +109,11 @@ return {
 				}),
 				-- Rust adapter via rustaceanvim
 				require("rustaceanvim.neotest"),
+				-- Python adapter for pytest
+				require("neotest-python")({
+					dap = { justMyCode = false },
+					runner = "pytest",
+				}),
 			},
 			status = { virtual_text = true },
 			output = { open_on_run = true },
